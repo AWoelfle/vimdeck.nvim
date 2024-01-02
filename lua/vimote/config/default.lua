@@ -1,20 +1,19 @@
 
 local leader = vim.g.mapleader
 local CR = '<CR>'
-vimote_default = {
-        name = 'default',
-	normal = {
-		{ key = '<leader>1', cmd = ':Telescope buffers' .. CR},
-		{ key = '<leader>2', cmd = ':Goyo'},
-		{ key = '<leader>3', cmd = ':Neotree'},
-		{ key = leader .. '', cmd = ''},
-		{ key = leader .. '', cmd = ''},
-		{ key = leader .. '', cmd = ''},
-		{ key = leader .. '', cmd = ''},
-		{ key = leader .. '', cmd = ''},
-		{ key = leader .. '', cmd = ''},
-		{ key = leader .. '', cmd = ''},
-	},
+
+default = {
+		{ mode = 'n', key = '<leader>1', cmd = ':Telescope buffers' .. CR},
+		{ mode = 'n', key = '<leader>2', cmd = ':Goyo'},
+		{ mode = 'n', key = '<leader>3', cmd = ':Neotree'},
+		{ mode = 'n', key = leader .. '', cmd = ''},
+		{ mode = 'n', key = leader .. '', cmd = ''},
+		{ mode = 'n', key = leader .. '', cmd = ''},
+		{ mode = 'n', key = leader .. '', cmd = ''},
+		{ mode = 'n', key = leader .. '', cmd = ''},
+		{ mode = 'n', key = leader .. '', cmd = ''},
+		{ mode = 'n', key = leader .. '9', cmd = ':VimoteCur' .. CR},
+		{ mode = 'n', key = leader .. '-', cmd = ':Vimote' .. CR},
 }
 
-
+return default
