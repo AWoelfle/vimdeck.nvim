@@ -32,5 +32,3 @@ vimote_clang = {
 	{ mode = 'n', key = '<leader>-', cmd = ':Vimote' .. CR},
 }
 
-
-

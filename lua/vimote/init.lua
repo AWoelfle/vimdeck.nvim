@@ -1,9 +1,4 @@
-local ui = require('ui')
-local default = require('default')
 
-
-local c_vimote = require('config.vimote')
-local c_clang = require('config.clang')
 
 
 local Vimote = {}
@@ -12,8 +7,10 @@ Vimote.__index = Vimote
 
 
 function Vimote.setup()
+    require('vimote.default')
+    require('vimote.ui')
     -- Setting the initial keybindings
-    current_channel = c_vimote
+    current_channel = require('vimote.config.vimote')
 
     -- Loading default profile
     Vimote.loadProf(current_channel)
@@ -21,6 +18,10 @@ function Vimote.setup()
     -- Creating Commands
     Vimote.createCmd()
 
+end
+
+function Vimote.getConfigTable()
+	return current_channel
 end
 
 function Vimote.loadProf(bindings)     
@@ -31,9 +32,13 @@ end
 
 
 function Vimote.current(bindings)
+	config_table = {}
     for k, v in ipairs(bindings) do
 	    print(bindings[k].mode, bindings[k].key, bindings[k].cmd)
+	    table.insert(config_table, table.maxn(config_table), { mode = bindings[k].mode, key = bindings[k].key, cmd = bindings[k].cmd })
     end
+
+    return config_table
 
 end
 
@@ -48,15 +53,13 @@ function Vimote.createCmd()
 
 	-- VimoteLoad
 	cmd.nvim_create_user_command('VimoteLoad', function(opts)
-		if opts.fargs[1] == 'clang' then
-	            Vimote.loadProf(c_clang)
-		    current_channel = c_clang
+                local config_opt = require('vimote.config.' .. opts.fargs[1])
+
+		if opts.fargs[1] then
+	            Vimote.loadProf(config_opt)
+		    current_channel = config_opt
 	        end
 
-		if opts.fargs[1] == 'default' then
-	            Vimote.loadProf(c_vimote)
-		    current_channel = c_vimote
-	        end
 	end,
 	{ nargs = 1 })	
 
@@ -68,32 +71,34 @@ function Vimote.createCmd()
         
 	--VimoteLookup
 	cmd.nvim_create_user_command('VimoteLookup', function(opts)
-		if opts.fargs[1] == 'clang' then
-			Vimote.current(c_clang)
+
+                local config_opt = 'vimote.config.' .. opts.fargs[1]
+		if opts.fargs[1] then
+			Vimote.current(config_opt)
 		end
-		if opts.fargs[1] == 'default' then
-			Vimote.current(c_vimote)
-		end
+
 	end,
         { nargs = 1 })
-
 end
 
+
+
 function Vimote.MainMenu() 
-  local opts = {'default', 'clang', 'cpp', 'javascript', 'lua', 'nim', 'npm',}
-  local cb = function(_, sel)
-    if sel == 'default' then
-	    vim.cmd(":VimoteLoad default")
-	    vim.cmd("echo 'Vimote: default profile loaded'")
-    end
-
-    if sel == 'clang' then
-	    vim.cmd(":VimoteLoad clang")
-	    vim.cmd("echo 'Vimote: clang profile loaded'")
-    end
-
-  end
-  ShowMenu(opts, cb)
+	local opts = {'default', 'clang', 'cpp', 'go', 'javascript', 'lua', 'nim', 'npm', 'zig'}
+  	local cb = function(_, sel)
+	if sel then
+		for i, item in ipairs(opts) do
+			if opts[i] == sel then
+				vim.cmd(":VimoteLoad " .. sel)
+	    	    		vim.cmd("echo 'Vimote: " .. sel ..  " profile loaded'")
+		    		break
+			end
+		end
+    	else
+	    error("Configuration for " .. sel .. " not found!")
+    	end
+	end
+	ShowMenu(opts, cb)
 end
 
 
