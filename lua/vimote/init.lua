@@ -1,19 +1,21 @@
 
 
+require('vimote.ui')
+
+
 
 Vimote = {}
-Vimote.__index = Vimote
-Vimote.utils = {}
+Vimote.channel = {}
 
 
-function Vimote.setup(opts, config)
-    require('vimote.ui')
+function Vimote.setup(opts)
     -- Setting the initial keybindings
-    current_channel = require('vimote.config.' .. opts)
+    Vimote.channel = require('vimote.config.default')
 
 
+    Vimote.opts = opts
     -- Loading default profile
-    Vimote.loadProf(current_channel)
+    Vimote:switch(Vimote.channel)
 
     -- Creating Commands
     Vimote.createCmd()
@@ -21,72 +23,74 @@ function Vimote.setup(opts, config)
 
 end
 
-function Vimote.loadProf(bindings)    
-    for k, v in ipairs(bindings) do
-            vim.keymap.set(bindings[k].mode, bindings[k].key, bindings[k].cmd)
+function Vimote:switch(config)    
+    for k, v in ipairs(config) do
+            vim.keymap.set(config[k].mode, config[k].key, config[k].cmd)
     end
 end
 
-function Vimote.current(bindings)
-    for k, v in ipairs(bindings) do
+function Vimote:current(config)
+    for k, v in ipairs(config) do
 	    print(k, v.mode, v.key, v.cmd)
     end
 end
 
-function Vimote.createCmd()
+function Vimote:createCmd()
 	local cmd = vim.api
-
 	cmd.nvim_create_user_command('Vimote', function(opts)
-		Vimote.MainMenu()
-	end, {})
+		if opts.fargs[1] == 'menu' then
+			Vimote.MainMenu(opts)
 
-	-- VimoteLoad
-	cmd.nvim_create_user_command('VimoteLoad', function(opts)
-                local config_opt = require('vimote.config.' .. opts.fargs[1])
+		elseif opts.fargs[1] == 'current' then
+			Vimote:current(Vimote.channel)
 
+		elseif opts.fargs[1] == 'load' then
+			if opts.fargs[2] then
+                		local config_opt = require('vimote.config.' .. opts.fargs[2])
+				Vimote:switch(config_opt)
+				Vimote.channel = config_opt
+			end
 
-		if opts.fargs[1] then
-	            Vimote.loadProf(config_opt)
-		    current_channel = config_opt
-	        end
-
-	end,
-	{ nargs = 1 })	
-
-	--VimoteCur
-	cmd.nvim_create_user_command('VimoteCur', function(opts)
-		Vimote.current(current_channel)
-	end,
-        {})
-        
-	--VimoteLookup
-	cmd.nvim_create_user_command('VimoteLookup', function(opts)
-
-                local config_opt = 'vimote.config.' .. opts.fargs[1]
-		if opts.fargs[1] then
-			Vimote.current(config_opt)
+		elseif opts.fargs[1] == 'lookup' then
+			if opts.fargs[2] then
+                		local config_opt = require('vimote.config.' .. opts.fargs[2])
+				Vimote:current(config_opt)
+			end
+		else 
+			Vimote.MainMenu(opts)
 		end
-
-	end,
-        { nargs = 1 })
+	end, {nargs = '*'})
+       
 end
 
-function Vimote.MainMenu() 
-	local opts = {'default', 'clang', 'cpp', 'go', 'javascript', 'lua', 'nim', 'npm', 'zig'}
+function Vimote:MainMenu() 
   	local cb = function(_, sel)
-	if sel then
-		for i, item in ipairs(opts) do
-			if opts[i] == sel then
-				vim.cmd(":VimoteLoad " .. sel)
+	if sel == nil then
+		error("Configuration for " .. sel .. " not found!")
+    	elseif sel then
+		for i, item in ipairs(Vimote.opts) do
+			if Vimote.opts[i] == sel then
+				vim.cmd(":Vimote load " .. sel)
 	    	    		vim.cmd("echo 'Vimote: " .. sel ..  " profile loaded'")
 		    		break
 			end
 		end
-    	else
-	    error("Configuration for " .. sel .. " not found!")
-    	end
 	end
-	ShowMenu(opts, cb)
+	end
+	ShowMenu(Vimote.opts, cb)
+end
+
+function Vimote:Browse()
+	local cb = function(_, sel)
+	if sel then
+		for i, item in ipairs(Vimote.opts) do
+			if Vimote.opts[i] == sel then
+				vim.cmd(":Vimote lookup " .. sel)
+			end
+		end
+	end
+	end
+	ShowMenu(Vimote.opts, cb)
 end
 
 

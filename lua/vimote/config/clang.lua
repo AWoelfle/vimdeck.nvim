@@ -11,9 +11,9 @@ clang = {
 	{ mode = 'n', key = '<leader>6', cmd = ''},
 	{ mode = 'n', key = '<leader>7', cmd = ''},
 	{ mode = 'n', key = '<leader>8', cmd = ''},
-	{ mode = 'n', key = '<leader>9', cmd = ':VimoteCur' .. CR},
+	{ mode = 'n', key = '<leader>9', cmd = ':Vimote current' .. CR},
 	{ mode = 'n', key = '<leader>0', cmd = ''},
-	{ mode = 'n', key = '<leader>-', cmd = ':Vimote' .. CR},
+	{ mode = 'n', key = '<leader>-', cmd = ':Vimote menu' .. CR},
 }
 
 return clang
