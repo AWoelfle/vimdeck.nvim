@@ -9,8 +9,8 @@ function ShowMenu(opts, cb)
   local borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" }
 
   Win_id = popup.create(opts, {
-        title = "Vimote",
-        highlight = "Vimote",
+        title = "Vimdeck",
+        highlight = "Vimdeck",
         line = math.floor(((vim.o.lines - height) / 2) - 1),
         col = math.floor((vim.o.columns - width) / 2),
         minwidth = width,

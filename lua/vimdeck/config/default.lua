@@ -12,8 +12,8 @@ default = {
 		{ mode = 'n', key = leader .. '', cmd = ''},
 		{ mode = 'n', key = leader .. '', cmd = ''},
 		{ mode = 'n', key = leader .. '', cmd = ''},
-		{ mode = 'n', key = leader .. '9', cmd = ':Vimote current' .. CR},
-		{ mode = 'n', key = leader .. '-', cmd = ':Vimote menu' .. CR},
+		{ mode = 'n', key = leader .. '9', cmd = ':Vimdeck current' .. CR},
+		{ mode = 'n', key = leader .. '-', cmd = ':Vimdeck menu' .. CR},
 }
 
 return default
