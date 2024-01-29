@@ -1,12 +1,14 @@
-
-
 require('vimdeck.ui')
-
 
 
 Vimdeck = {}
 Vimdeck.channel = {}
+Vimdeck.currentName = {}
 
+
+local win_width = vim.api.nvim_win_get_width(0) - 1
+Vimdeck.channelGuideBuf = vim.api.nvim_create_buf(false, true)
+Vimdeck.channelGuide = vim.api.nvim_open_win(Vimdeck.channelGuideBuf, false, {relative='win', anchor='NE', col=win_width, row=0, width=20, height=1, border='rounded', title='Vimdeck', title_pos='right'})
 
 function Vimdeck.setup(opts)
     -- Setting the initial keybindings
@@ -19,6 +21,9 @@ function Vimdeck.setup(opts)
 
     -- Creating Commands
     Vimdeck.createCmd()
+
+
+    Vimdeck.DisplayChannelGuide()
 
 
 end
@@ -72,10 +77,12 @@ function Vimdeck:MainMenu()
 			if Vimdeck.opts[i] == sel then
 				vim.cmd(":Vimdeck load " .. sel)
 	    	    		vim.cmd("echo 'Vimdeck: " .. sel ..  " profile loaded'")
+				Vimdeck:UpdateChannelGuide({sel})
 		    		break
 			end
 		end
 	end
+	
 	end
 	ShowMenu(Vimdeck.opts, cb)
 end
@@ -83,6 +90,7 @@ end
 function Vimdeck:Browse()
 	local cb = function(_, sel)
 	if sel then
+		Vimdeck.currentChannelName = sel
 		for i, item in ipairs(Vimdeck.opts) do
 			if Vimdeck.opts[i] == sel then
 				vim.cmd(":Vimdeck lookup " .. sel)
@@ -91,6 +99,21 @@ function Vimdeck:Browse()
 	end
 	end
 	ShowMenu(Vimdeck.opts, cb)
+end
+
+
+
+
+function Vimdeck:DisplayChannelGuide()
+	local buf = vim.api.nvim_win_get_buf(Vimdeck.channelGuide)
+	
+	local vimdeckOpts = Vimdeck.currentName
+	vim.api.nvim_buf_set_lines(buf, 0, -1, true, {"default"})
+end
+
+function Vimdeck:UpdateChannelGuide(channelName)
+	local buf = vim.api.nvim_win_get_buf(Vimdeck.channelGuide)
+	vim.api.nvim_buf_set_lines(buf, 0, -1, true, channelName)
 end
 
 
